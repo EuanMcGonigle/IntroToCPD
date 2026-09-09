@@ -607,7 +607,7 @@ m1.lik <- sum(dnorm(temp.data$anomaly, mean = m1, sd = sd(temp.data$anomaly),
                     log = TRUE))
 m1.aic <- 2*2 - 2*m1.lik
 
-mean.m2 <- calc.mean.func(temp.data$anomaly, m2@cpts[1:2])
+mean.m2 <- calc.mean.func(temp.data$anomaly, m2@cpts[1])
 m2.lik <- sum(dnorm(temp.data$anomaly, mean = mean.m2,
                     sd = sd(temp.data$anomaly - mean.m2), log = TRUE))
 m2.aic <- 2*3 - 2*m2.lik
