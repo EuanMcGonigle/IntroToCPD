@@ -27,20 +27,13 @@ knitr::opts_chunk$set(echo = TRUE, fig.align = 'center', warning=FALSE, message=
 
 - Full solutions are given below. If you feel you're spending too much time on any question (particularly Question 1), you can read the solution and move on to questions 2 -- 4.
 
+- Likewise, feel free to "vibe code" if you want to save time, or use existing R package functionality rather than writing your own code.
+
 - Bonus questions: Q 1(e) is a bonus, as is Question 5. Feel free to skip these if you want.
 
 - For any functions you're not sure how to use, use `?function_name` in R to get help (or ask me!).
 
 - In the time we have, I don't expect you to finish all questions. If you can, try to finish at least Q2.
-
-## Learning outcomes
-
-By the end of this lab you should be able to:
-
-- implement the CUSUM and MOSUM statistics from scratch, and estimate the noise level robustly in the presence of change points;
-- apply the `changepoint`, `mosum` and `EnvCpt` packages, and relate their output to your own implementations;
-- choose and interpret thresholds and bandwidths, and reason about false alarms (Type I error);
-- use information criteria (AIC and BIC) to choose between competing change point models, and recognise when the modelling assumptions (such as independent noise) may fail.
 
 ## Question 1: Creating a test statistic to estimate change points
 
@@ -97,7 +90,7 @@ MOSUM.calc <- function(x, G){
 ```
 
 
-(b) To set a threshold for declaring changes, we need to know the noise level $\sigma$. In reality this is unknown, so we must estimate it from the data -- but the change points themselves (and any trend) will inflate a naive estimate of the spread. Consider the following candidate estimators of $\sigma$:
+(b) To set a threshold for declaring changes, we need to know the noise level $\sigma$. In reality this is unknown, so we must estimate it from the data -- but the change points themselves will inflate a naive estimate. Consider the following candidate estimators of $\sigma$:
 
     - **(i)** the sample standard deviation of the whole series, `sd(x)`;
 
@@ -162,41 +155,41 @@ CUSUM.calc2 <- function(x){
 ```
 
 
-**Check your code before trusting it.** Confirm your function behaves sensibly on data where you already know the answer, with two controlled tests.
+Confirm your function behaves sensibly on data where you already know the answer, with two controlled tests:
 
-*A change is present.* Simulate a series with one known change in mean, `set.seed(1); x <- c(rnorm(100), rnorm(100, mean = 2))`, which changes at $t = 100$. Your (scaled) statistic should peak clearly near $t = 100$ and comfortably exceed a sensible threshold.
+*One change point*. Simulate a series with one known change in mean, `set.seed(1); x <- c(rnorm(100), rnorm(100, mean = 2))`, which changes at $t = 100$. Your (scaled) statistic should peak clearly near $t = 100$.
 
-*No change (pure noise).* Now simulate a series with **no** change at all, `set.seed(1); x <- rnorm(300)`. There is nothing to find, so your statistic should mostly stay *below* the threshold. Try a few different seeds: how often does it cross the threshold anyway? That rate is the false-alarm (Type I error) probability, and controlling it is exactly what the threshold is for.
+*No change point.* Now simulate a series with **no** change at all, `set.seed(1); x <- rnorm(300)`. There is nothing to find, so your statistic should mostly stay close to zero.
 
-**Solution:** Using the scaled CUSUM statistic from part (c):
+**Solution:** Plotting the scaled CUSUM statistic for each case:
 
-```{r fig.width=5, fig.height=3, fig.align='center'}
+```{r fig.width=8, fig.height=3, fig.align='center'}
+par(mfrow = c(1, 2))
+
 # (1) a series with a known change at t = 100
 set.seed(1)
 x <- c(rnorm(100), rnorm(100, mean = 2))
-cusum <- CUSUM.calc2(x)
-which.max(cusum)                        # should be near 100
-max(cusum) > sqrt(2 * log(length(x)))   # should be TRUE
+plot(CUSUM.calc2(x), type = "l", xlab = "k", ylab = "scaled CUSUM",
+     main = "one change at t = 100")
+abline(v = 100, col = "red", lty = 2)
 
-# (2) pure noise, no change: repeat many times and count false alarms
+# (2) pure noise, no change
 set.seed(1)
-false.alarms <- replicate(1000, {
-  z <- rnorm(300)
-  max(CUSUM.calc2(z)) > sqrt(2 * log(length(z)))
-})
-mean(false.alarms)                       # empirical false-alarm rate
+z <- rnorm(300)
+plot(CUSUM.calc2(z), type = "l", xlab = "k", ylab = "scaled CUSUM",
+     main = "no change")
 ```
 
-For the first series the peak sits exactly at $t = 100$ and clears the threshold, confirming the statistic works. For pure noise the statistic only occasionally exceeds the threshold: here the estimated false-alarm rate is around 5%, so $D = \sqrt{2\log n}$ behaves like a test with a small significance level. Raising $D$ lowers the false-alarm rate at the cost of power to detect real changes, and lowering it does the reverse.
+For the first series the statistic peaks sharply at $t = 100$, confirming the function works; for pure noise it stays small throughout, since there is nothing to detect.
 
-(d) What is the computational complexity of the code you wrote in part (a)? How fast could it be? Verify your answer empirically: use `system.time()` to time your function on series of increasing length (say $n = 10^3, 10^4, 10^5, 10^6$) and check that the runtime grows roughly linearly.
+(d) What is the computational complexity of the code you wrote in part (a)? How fast could it be? If you have time, verify your answer empirically: use `system.time()` to time your function on series of increasing length (say $n = 10^2, 10^3, 10^4, 10^5$) and check how the runtime grows.
 
 **Solution**: By using sequential updates, both methods can be computed on $O(n)$ computational complexity.
 
 We can check this empirically -- the elapsed time should grow roughly in proportion to $n$ (multiplying by about 10 each time $n$ does):
 
 ```{r}
-for (nn in c(1e3, 1e4, 1e5, 1e6)) {
+for (nn in c(1e2, 1e3, 1e4, 1e5)) {
   set.seed(1)
   z <- rnorm(nn)
   cat("n =", nn, " time =", system.time(CUSUM.calc(z))["elapsed"], "s\n")
@@ -303,7 +296,7 @@ p1
 
 Around 1900 it looks like there could be a drop in the volume of river flow.
 
-(b) Calculate the CUSUM statistic for the Nile volume data. Using the threshold $D = \sqrt{2 \log (n)}$, perform a test to decide if there is a change point. If there is one, where is it? (Where does this threshold come from? Think about how large the CUSUM of pure noise can get -- see the null experiment in Question 1.)
+(b) Calculate the CUSUM statistic for the Nile volume data. Using the threshold $D = \sqrt{2 \log (n)}$, perform a test to decide if there is a change point. If there is one, where is it? 
 
 **Solution**:
 
@@ -339,7 +332,7 @@ The change point is located at year `r nile.data$year[nile.cpt]`.
   
     Does this agree with your answer from part (b)?
 
-    (The value $D = 3.4$ is not arbitrary: it is approximately the critical value that controls the false-alarm probability at a chosen significance level. The `mosum` package computes such values for you via `mosum:::mosum.criticalValue()`, which you will use indirectly in Question 3.)
+    (The value $D = 3.4$ is not arbitrary: it is approximately the critical value that controls the false-alarm probability at the 5% chosen significance level.)
 
 **Solution**:
 
@@ -450,7 +443,7 @@ library(changepoint)
 library(mosum)
 ```
 
-(b) Setting the argument `method = "AMOC"` (at most one change), use the `cpt.mean()` function on the Nile data set. Do the results agree with your answer from question 2(b)?
+(b) Setting the argument `method = "AMOC"`, use the `cpt.mean()` function on the Nile data set. Do the results agree with your answer from question 2(b)?
 
 **Solution:**
 
@@ -461,7 +454,9 @@ nile.data$year[nile.cpts.cusum@cpts]
 
 Yes: same answer as before (`cpt.mean()` also returns the last time index).
 
-(c) Use the `cpt.mean()` function to apply the PELT algorithm on the Nile data set. Is the answer the same as part (b)? **Note**: you will need to standardise the data first (subtract the mean and divide by the standard deviation). (Why does this matter? By default `cpt.mean()` looks for changes in mean assuming the data has variance 1; if the series has a different variance the fixed penalty is effectively mis-scaled -- too harsh or too lenient -- and you can get the wrong number of change points.)
+(c) Use the `cpt.mean()` function to apply the PELT algorithm on the Nile data set. Is the answer the same as part (b)? 
+
+    **Note**: you will need to standardise the data first (subtract the mean and divide by the standard deviation). (Why does this matter? By default `cpt.mean()` looks for changes in mean assuming the data has variance 1; if the series has a different variance, then the penalty is scaled incorrectly.)
 
 **Solution:**
 
@@ -495,7 +490,7 @@ nile.data$year[nile.cpts.mosum$cpts]
 
 Yes: same answer as before.
 
-(f) By investigating the output returned by the `mosum()` function, what are the estimated jump sizes and p-value(s) of the detected change points?
+(f) By investigating the output returned by the `mosum()` function, what are the p-value(s) of the detected change points?
 
 **Solution**:
  
@@ -503,7 +498,7 @@ Yes: same answer as before.
 nile.cpts.mosum$cpts.info
 ```
 
-The p-value associated to the change is `r nile.cpts.mosum$cpts.info[4]` (this is calculated using the asymptotic null distribution of the test statistic). The jump size is `r nile.cpts.mosum$cpts.info[5]`.
+The p-value associated to the change is `r nile.cpts.mosum$cpts.info[4]` (this is calculated using the asymptotic null distribution of the test statistic).
 
   *Python users*: you can use the `ruptures` function `Pelt()` and the `mosum` function `mosum()` for this question. See [https://centre-borelli.github.io/ruptures-docs/](https://centre-borelli.github.io/ruptures-docs/) and [https://pypi.org/project/mosum/](https://pypi.org/project/mosum/) for help.
 

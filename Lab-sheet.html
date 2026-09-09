@@ -2424,7 +2424,8 @@ window.Quarto = {
 <li>Setting the argument <code>method = &quot;AMOC&quot;</code>, use the <code>cpt.mean()</code> function on the Nile data set. Do the results agree with your answer from question 2(b)?</li>
 </ol>
 <ol start="3" type="a">
-<li>Use the <code>cpt.mean()</code> function to apply the PELT algorithm on the Nile data set. Is the answer the same as part (b)? <strong>Note</strong>: you will need to standardise the data first (subtract the mean and divide by the standard deviation). (Why does this matter? By default <code>cpt.mean()</code> looks for changes in mean assuming the data has variance 1; if the series has a different variance the fixed penalty is effectively mis-scaled – too harsh or too lenient – and you can get the wrong number of change points.)</li>
+<li><p>Use the <code>cpt.mean()</code> function to apply the PELT algorithm on the Nile data set. Is the answer the same as part (b)?</p>
+<p><strong>Note</strong>: you will need to standardise the data first (subtract the mean and divide by the standard deviation). (Why does this matter? By default <code>cpt.mean()</code> looks for changes in mean assuming the data has variance 1; if the series has a different variance, then the penalty is scaled incorrectly.)</p></li>
 </ol>
 <ol start="4" type="a">
 <li>By investigating the output returned by the <code>cpt.mean()</code> function, what was the value of the penalty function used?</li>
