@@ -2525,7 +2525,7 @@ window.Quarto = {
 <pre><code>n = 100  time = 0 s
 n = 1000  time = 0 s
 n = 10000  time = 0.003 s
-n = 1e+05  time = 0.025 s</code></pre>
+n = 1e+05  time = 0.023 s</code></pre>
 </div>
 </div>
 <ol start="5" type="a">
@@ -2924,17 +2924,17 @@ n = 1e+05  time = 0.025 s</code></pre>
 <div class="cell" data-layout-align="center">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>m1.lik <span class="ot">&lt;-</span> <span class="fu">sum</span>(<span class="fu">dnorm</span>(temp.data<span class="sc">$</span>anomaly, <span class="at">mean =</span> m1, <span class="at">sd =</span> <span class="fu">sd</span>(temp.data<span class="sc">$</span>anomaly), </span>
 <span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>                    <span class="at">log =</span> <span class="cn">TRUE</span>))</span>
-<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>m1.aic <span class="ot">&lt;-</span> <span class="dv">2</span><span class="sc">*</span><span class="dv">2</span> <span class="sc">-</span> <span class="dv">2</span><span class="sc">*</span>m1.lik</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>m1.aic <span class="ot">&lt;-</span> <span class="dv">2</span><span class="sc">*</span><span class="dv">2</span> <span class="sc">-</span> <span class="dv">2</span><span class="sc">*</span>m1.lik   <span class="co"># k = 2: mean + variance</span></span>
 <span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>mean.m2 <span class="ot">&lt;-</span> <span class="fu">calc.mean.func</span>(temp.data<span class="sc">$</span>anomaly, m2<span class="sc">@</span>cpts[<span class="dv">1</span>])</span>
 <span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>m2.lik <span class="ot">&lt;-</span> <span class="fu">sum</span>(<span class="fu">dnorm</span>(temp.data<span class="sc">$</span>anomaly, <span class="at">mean =</span> mean.m2,</span>
 <span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>                    <span class="at">sd =</span> <span class="fu">sd</span>(temp.data<span class="sc">$</span>anomaly <span class="sc">-</span> mean.m2), <span class="at">log =</span> <span class="cn">TRUE</span>))</span>
-<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>m2.aic <span class="ot">&lt;-</span> <span class="dv">2</span><span class="sc">*</span><span class="dv">3</span> <span class="sc">-</span> <span class="dv">2</span><span class="sc">*</span>m2.lik</span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>m2.aic <span class="ot">&lt;-</span> <span class="dv">2</span><span class="sc">*</span><span class="dv">4</span> <span class="sc">-</span> <span class="dv">2</span><span class="sc">*</span>m2.lik   <span class="co"># k = 4: 2 segment means + 1 change location + variance</span></span>
 <span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a>mean.m3 <span class="ot">&lt;-</span> m3<span class="sc">$</span>fitted.values</span>
 <span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a>m3.lik <span class="ot">&lt;-</span> <span class="fu">sum</span>(<span class="fu">dnorm</span>(temp.data<span class="sc">$</span>anomaly, <span class="at">mean =</span> mean.m3,</span>
 <span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a>                    <span class="at">sd =</span> <span class="fu">sd</span>(temp.data<span class="sc">$</span>anomaly <span class="sc">-</span> mean.m3), <span class="at">log =</span> <span class="cn">TRUE</span>))</span>
-<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a>m3.aic <span class="ot">&lt;-</span> <span class="dv">2</span><span class="sc">*</span><span class="dv">3</span> <span class="sc">-</span> <span class="dv">2</span><span class="sc">*</span>m3.lik</span>
+<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a>m3.aic <span class="ot">&lt;-</span> <span class="dv">2</span><span class="sc">*</span><span class="dv">3</span> <span class="sc">-</span> <span class="dv">2</span><span class="sc">*</span>m3.lik   <span class="co"># k = 3: intercept + slope + variance</span></span>
 <span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb29-15"><a href="#cb29-15" aria-hidden="true" tabindex="-1"></a>mean.m4 <span class="ot">&lt;-</span> <span class="fu">numeric</span>(<span class="dv">0</span>)</span>
 <span id="cb29-16"><a href="#cb29-16" aria-hidden="true" tabindex="-1"></a>cpts <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>, m4<span class="sc">@</span>cpts)</span>
@@ -2945,11 +2945,11 @@ n = 1e+05  time = 0.025 s</code></pre>
 <span id="cb29-21"><a href="#cb29-21" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb29-22"><a href="#cb29-22" aria-hidden="true" tabindex="-1"></a>m4.lik <span class="ot">&lt;-</span> <span class="fu">sum</span>(<span class="fu">dnorm</span>(temp.data<span class="sc">$</span>anomaly, <span class="at">mean =</span> mean.m4,</span>
 <span id="cb29-23"><a href="#cb29-23" aria-hidden="true" tabindex="-1"></a>                    <span class="at">sd =</span> <span class="fu">sd</span>(temp.data<span class="sc">$</span>anomaly <span class="sc">-</span> mean.m4), <span class="at">log =</span> <span class="cn">TRUE</span>))</span>
-<span id="cb29-24"><a href="#cb29-24" aria-hidden="true" tabindex="-1"></a>m4.aic <span class="ot">&lt;-</span> <span class="dv">2</span> <span class="sc">*</span> (<span class="dv">3</span> <span class="sc">*</span> <span class="fu">nseg</span>(m4)) <span class="sc">-</span> <span class="dv">2</span> <span class="sc">*</span> m4.lik</span>
+<span id="cb29-24"><a href="#cb29-24" aria-hidden="true" tabindex="-1"></a>m4.aic <span class="ot">&lt;-</span> <span class="dv">2</span> <span class="sc">*</span> (<span class="dv">3</span> <span class="sc">*</span> <span class="fu">nseg</span>(m4)) <span class="sc">-</span> <span class="dv">2</span> <span class="sc">*</span> m4.lik   <span class="co"># k = 3*nseg: coefs + change locations + variance</span></span>
 <span id="cb29-25"><a href="#cb29-25" aria-hidden="true" tabindex="-1"></a>aic.values <span class="ot">&lt;-</span> <span class="fu">c</span>(m1.aic, m2.aic, m3.aic, m4.aic)</span>
 <span id="cb29-26"><a href="#cb29-26" aria-hidden="true" tabindex="-1"></a>aic.values</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1]  149.96725  -34.93232  -58.92589 -232.69213</code></pre>
+<pre><code>[1]  149.96725  -32.93232  -58.92589 -232.69213</code></pre>
 </div>
 </div>
 <p>You can also just directly use <code>AIC()</code> and <code>BIC()</code> functions in R to compare models fitted using the <code>EnvCpt</code> package (note the slight difference in values compared to above, as simultaneous variance changes are also allowed in <code>EnvCpt</code>):</p>

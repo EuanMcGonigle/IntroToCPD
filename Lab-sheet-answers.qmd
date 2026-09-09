@@ -605,17 +605,17 @@ temp.cpt.models <- envcpt(temp.data$anomaly, models = c("mean", "meancpt",
 ```{r}
 m1.lik <- sum(dnorm(temp.data$anomaly, mean = m1, sd = sd(temp.data$anomaly), 
                     log = TRUE))
-m1.aic <- 2*2 - 2*m1.lik
+m1.aic <- 2*2 - 2*m1.lik   # k = 2: mean + variance
 
 mean.m2 <- calc.mean.func(temp.data$anomaly, m2@cpts[1])
 m2.lik <- sum(dnorm(temp.data$anomaly, mean = mean.m2,
                     sd = sd(temp.data$anomaly - mean.m2), log = TRUE))
-m2.aic <- 2*3 - 2*m2.lik
+m2.aic <- 2*4 - 2*m2.lik   # k = 4: 2 segment means + 1 change location + variance
 
 mean.m3 <- m3$fitted.values
 m3.lik <- sum(dnorm(temp.data$anomaly, mean = mean.m3,
                     sd = sd(temp.data$anomaly - mean.m3), log = TRUE))
-m3.aic <- 2*3 - 2*m3.lik
+m3.aic <- 2*3 - 2*m3.lik   # k = 3: intercept + slope + variance
 
 mean.m4 <- numeric(0)
 cpts <- c(0, m4@cpts)
@@ -626,7 +626,7 @@ for(i in 1:nseg(m4)){
 
 m4.lik <- sum(dnorm(temp.data$anomaly, mean = mean.m4,
                     sd = sd(temp.data$anomaly - mean.m4), log = TRUE))
-m4.aic <- 2 * (3 * nseg(m4)) - 2 * m4.lik
+m4.aic <- 2 * (3 * nseg(m4)) - 2 * m4.lik   # k = 3*nseg: coefs + change locations + variance
 aic.values <- c(m1.aic, m2.aic, m3.aic, m4.aic)
 aic.values
 ```
