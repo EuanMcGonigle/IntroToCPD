@@ -106,13 +106,13 @@ MOSUM.calc <- function(x, G){
 
 **Solution:** The key is to find an estimator that is not thrown off by the change points (or by a trend):
 
-    - **(i)** `sd(x)` is a **bad** choice. The changes in mean (and any trend) are counted as part of the spread, so the estimate is positively biased -- often badly so.
+**(i)** `sd(x)` is a **bad** choice. The changes in mean (and any trend) are counted as part of the spread, so the estimate is positively biased -- often badly so.
 
-    - **(iii)** `mad(x)` is more robust to the occasional outlier than `sd(x)`, but it is **still biased** here: a change in mean moves a large fraction of the observations away from the overall median, and the MAD only tolerates contamination affecting less than half of the data. Robustness to outliers is not the same as robustness to change points.
+**(iii)** `mad(x)` is more robust to the occasional outlier than `sd(x)`, but it is **still biased** here: a change in mean moves a large fraction of the observations away from the overall median, and the MAD only tolerates contamination affecting less than half of the data. Robustness to outliers is not the same as robustness to change points.
 
-    - **(ii)** `sd(x[1:20])` is **defensible but fragile**. It is unbiased *if* the first 20 observations form a single clean segment with no change point and no trend, but an early change or a trend ruins it, and it throws away almost all of the data.
+**(ii)** `sd(x[1:20])` is **defensible but fragile**. It is unbiased *if* the first 20 observations form a single clean segment with no change point and no trend, but an early change or a trend ruins it, and it throws away almost all of the data.
 
-    - **(iv)** `mad(diff(x) / sqrt(2))` is the **best** of the four, and is the one we use. First-differencing removes a piecewise-constant mean, so the differenced series is just noise except for a spike at each change point. As there are only a few change points, these behave as rare outliers that the MAD ignores. The factor $\sqrt{2}$ corrects for $\text{Var}(x_{t+1} - x_t) = 2\sigma^2$, so that the estimator targets $\sigma$ rather than $\sqrt{2}\,\sigma$.
+**(iv)** `mad(diff(x) / sqrt(2))` is the **best** of the four, and is the one we use. First-differencing removes a piecewise-constant mean, so the differenced series is just noise except for a spike at each change point. As there are only a few change points, these behave as rare outliers that the MAD ignores. The factor $\sqrt{2}$ corrects for $\text{Var}(x_{t+1} - x_t) = 2\sigma^2$, so that the estimator targets $\sigma$ rather than $\sqrt{2}\,\sigma$.
 
 More sophisticated *local* estimators can also be used -- for example the local variance estimators in the `mosum` package, $\widehat{\sigma}^2(k) = (\widehat{\sigma}^2_{(k-G+1):k} + \widehat{\sigma}^2_{(k+1):(k+G)})/2$, where $\widehat{\sigma}^2_{s:e}$ is the sample variance of the data from $s$ to $e$.
 
